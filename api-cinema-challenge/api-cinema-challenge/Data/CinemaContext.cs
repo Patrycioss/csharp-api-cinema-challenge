@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
 namespace api_cinema_challenge.Data
 {
-    public class CinemaContext : DbContext
+    public sealed class CinemaContext : DbContext
     {
-        private string _connectionString;
+        private readonly string _connectionString;
         public CinemaContext(DbContextOptions<CinemaContext> options) : base(options)
         {
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             _connectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnectionString")!;
-            this.Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
