@@ -8,14 +8,4 @@ public class ScreeningPost
     public DateTime StartsAt { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-
-    public ScreeningPost(Models.Screening screening)
-    {
-        Id = screening.Id;
-        ScreenNumber = screening.ScreenNumber;
-        Capacity = screening.Capacity;
-        StartsAt = screening.StartsAt;
-        CreatedAt = screening.CreatedAt;
-        UpdatedAt = screening.UpdatedAt;
-    }
 }

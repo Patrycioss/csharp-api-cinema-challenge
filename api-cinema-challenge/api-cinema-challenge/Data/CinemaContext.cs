@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using api_cinema_challenge.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace api_cinema_challenge.Data
 {
@@ -14,12 +15,17 @@ namespace api_cinema_challenge.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(_connectionString);
+            // optionsBuilder.UseNpgsql(_connectionString);
+            optionsBuilder.UseInMemoryDatabase("Database");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
         }
+        
+        public DbSet<Customer>  Customers { get; set; }
+        public DbSet<Movie>  Movies { get; set; }
+        public DbSet<Screening> Screenings { get; set; }
     }
 }

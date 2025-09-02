@@ -24,7 +24,7 @@ public class Movie
     public DateTime CreatedAt { get; set; }
     
     [Column("updated_at", TypeName = "timestamp with time zone")]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     
     [Column("screenings")]
     public ICollection<Screening> Screenings { get; set; }
