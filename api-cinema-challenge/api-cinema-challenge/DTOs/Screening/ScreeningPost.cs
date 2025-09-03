@@ -7,5 +7,5 @@ public class ScreeningPost
     public int Capacity { get; set; }
     public DateTime StartsAt { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

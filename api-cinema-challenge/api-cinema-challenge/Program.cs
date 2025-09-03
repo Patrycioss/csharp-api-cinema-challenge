@@ -1,4 +1,5 @@
 using api_cinema_challenge.Data;
+using api_cinema_challenge.Endpoints;
 using api_cinema_challenge.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,5 +21,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
+app.ConfigureCustomerEndpoints();
 app.Run();

@@ -16,13 +16,15 @@ public class MovieRepository : IMovieRepository
     
     public async Task<Movie> CreateMovie(MoviePut moviePut)
     {
+        var createTime = DateTime.UtcNow;
         var movie = new Movie
         {
             Id = await GetNewId(),
             Title = moviePut.Title,
             Rating = moviePut.Rating,
             Description = moviePut.Description,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = createTime,
+            UpdatedAt = createTime,
         };
         
         _context.Movies.Add(movie);

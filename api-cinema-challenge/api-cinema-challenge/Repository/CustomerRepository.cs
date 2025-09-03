@@ -14,17 +14,8 @@ public class CustomerRepository : ICustomerRepository
         _context = context;
     }
     
-    public async Task<Customer> CreateCustomer(CustomerPut customerPut)
+    public async Task<Customer> CreateCustomer(Customer customer)
     {
-        var customer = new Customer
-        {
-            Id = await GetNewId(),
-            Name = customerPut.Name,
-            Email = customerPut.Email,
-            Phone = customerPut.Phone,
-            CreatedAt = DateTime.UtcNow,
-        };
-        
         _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
         return customer;
@@ -35,20 +26,13 @@ public class CustomerRepository : ICustomerRepository
         return await _context.Customers.ToListAsync();
     }
 
-    public async Task<Customer?> UpdateCustomer(int id, CustomerPut customerPut)
+    public Task<Customer?> GetCustomer(int id)
     {
-        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == id);
+        return _context.Customers.FirstOrDefaultAsync(customer => customer.Id == id);
+    }
 
-        if (customer == null)
-        {
-            return null;
-        }
-        
-        customer.Name = customerPut.Name;
-        customer.Email = customerPut.Email;
-        customer.Phone = customerPut.Phone;
-        customer.UpdatedAt = DateTime.UtcNow;
-
+    public async Task<Customer> UpdateCustomer(Customer customer)
+    {
         _context.Update(customer);
         await _context.SaveChangesAsync();
         return customer;

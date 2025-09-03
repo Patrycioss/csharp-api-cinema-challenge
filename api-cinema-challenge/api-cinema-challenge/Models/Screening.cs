@@ -27,5 +27,5 @@ public class Screening
     public DateTime CreatedAt { get; set; }
     
     [Column("updated_at", TypeName = "timestamp with time zone")]
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

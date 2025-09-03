@@ -16,13 +16,15 @@ public class ScreeningRepository : IScreeningRepository
     
     public async Task<Screening> CreateScreening(ScreeningPut screeningPut)
     {
+        var createTime = DateTime.UtcNow;
         var screening = new Screening
         {
             Id = await GetNewId(),
             ScreenNumber = screeningPut.ScreenNumber,
             Capacity = screeningPut.Capacity,
             StartsAt = screeningPut.StartsAt,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = createTime,
+            UpdatedAt = createTime,
         };
         
         _context.Screenings.Add(screening);
