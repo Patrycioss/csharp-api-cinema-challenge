@@ -1,5 +1,4 @@
 ﻿using api_cinema_challenge.Data;
-using api_cinema_challenge.DTOs.Customer;
 using api_cinema_challenge.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,26 +37,9 @@ public class CustomerRepository : ICustomerRepository
         return customer;
     }
 
-    public async Task<Customer?> DeleteCustomer(int id)
+    public async Task DeleteCustomer(Customer customer)
     {
-        var  customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == id);
-        if (customer == null)
-        {
-            return null;
-        }
-        
         _context.Customers.Remove(customer);
         await _context.SaveChangesAsync();
-        return customer;
-    }
-    
-    private async Task<int> GetNewId()
-    {
-        if (!_context.Customers.Any())
-        {
-            return 1;
-        }
-        
-        return await _context.Customers.MaxAsync(e => e.Id) + 1;
     }
 }

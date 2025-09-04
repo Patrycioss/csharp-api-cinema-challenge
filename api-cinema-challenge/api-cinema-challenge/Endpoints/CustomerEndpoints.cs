@@ -18,7 +18,7 @@ public static class CustomerEndpoints
     private static async Task<IResult> Create(ICustomerRepository customerRepository, CustomerPut customerPut)
     {
         var createTime = DateTime.UtcNow;
-        var customer = new Customer()
+        var customer = new Customer
         {
             Email = customerPut.Email,
             Name = customerPut.Name,
@@ -55,12 +55,13 @@ public static class CustomerEndpoints
     
     private static async Task<IResult> Delete(ICustomerRepository customerRepository, int id)
     {
-        var customer = await customerRepository.DeleteCustomer(id);
+        var customer = await customerRepository.GetCustomer(id);
         if (customer == null)
         {
             return Results.NotFound("Customer not found");
         }
-        
+
+        await customerRepository.DeleteCustomer(customer);
         return Results.Ok(customer);
     }
 }

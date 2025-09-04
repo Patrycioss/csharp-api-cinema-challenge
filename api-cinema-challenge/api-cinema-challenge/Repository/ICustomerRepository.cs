@@ -8,5 +8,5 @@ public interface ICustomerRepository
     public Task<IEnumerable<Customer>> GetCustomers();
     public Task<Customer?> GetCustomer(int id);
     public Task<Customer> UpdateCustomer(Customer customer);
-    public Task<Customer?> DeleteCustomer(int id);
+    public Task DeleteCustomer(Customer customer);
 }
