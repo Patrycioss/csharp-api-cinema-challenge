@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace api_cinema_challenge.Models;
 
@@ -26,6 +27,7 @@ public class Movie
     [Column("updated_at", TypeName = "timestamp with time zone")]
     public DateTime UpdatedAt { get; set; }
     
+    [JsonIgnore]
     [Column("screenings")]
     public ICollection<Screening> Screenings { get; set; }
 }

@@ -24,4 +24,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.ConfigureCustomerEndpoints();
+app.ConfigureMovieEndpoints();
 app.Run();

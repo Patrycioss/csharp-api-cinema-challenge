@@ -25,7 +25,12 @@ public class MovieRepository : IMovieRepository
         return await _context.Movies.ToListAsync();
     }
 
-    public async Task<Movie?> UpdateMovie(Movie movie)
+    public async Task<Movie?> GetMovie(int id)
+    {
+        return await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
+    }
+
+    public async Task<Movie> UpdateMovie(Movie movie)
     {
         _context.Update(movie);
         await _context.SaveChangesAsync();
