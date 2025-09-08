@@ -1,6 +1,7 @@
 ﻿using api_cinema_challenge.DTOs.Customer;
 using api_cinema_challenge.Models;
-using api_cinema_challenge.Repository;
+using exercise.wwwapi.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api_cinema_challenge.Endpoints;
@@ -18,8 +19,10 @@ public static class CustomerEndpoints
             "Delete an existing customer. When deleting data, it's useful to send the deleted record back to the client so they can re-create it if deletion was a mistake.\n");
     }
 
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    private static async Task<IResult> Create(ICustomerRepository customerRepository, CustomerPut customerPut)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    private static async Task<IResult> Create(IRepository<Customer> customerRepository, CustomerPut customerPut)
     {
         var createTime = DateTime.UtcNow;
         var customer = new Customer
@@ -30,15 +33,18 @@ public static class CustomerEndpoints
             CreatedAt = createTime,
             UpdatedAt = createTime,
         };
-        var result = await customerRepository.CreateCustomer(customer);
-        return Results.Created("/", result);
+        customerRepository.Insert(customer);
+        await customerRepository.SaveAsync();
+        return Results.Created("/", customer);
     }
 
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    private static async Task<IResult> GetAll(ICustomerRepository customerRepository)
+    private static async Task<IResult> GetAll(IRepository<Customer> customerRepository)
     {
-        var result = await customerRepository.GetCustomers();
+        var result = await customerRepository.GetAllAsync();
 
         var resultArray = result.ToArray();
         if (resultArray.Length == 0)
@@ -48,12 +54,14 @@ public static class CustomerEndpoints
 
         return Results.Ok(resultArray);
     }
-
+    
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    private static async Task<IResult> Update(ICustomerRepository customerRepository, int id, CustomerPut customerPut)
+    private static async Task<IResult> Update(IRepository<Customer> customerRepository, int id, CustomerPut customerPut)
     {
-        var customer = await customerRepository.GetCustomer(id);
+        var customer = await customerRepository.GetByIdAsync(id);
         if (customer == null)
         {
             return Results.NotFound("Customer not found");
@@ -64,21 +72,27 @@ public static class CustomerEndpoints
         customer.Email = customerPut.Email;
         customer.UpdatedAt = DateTime.UtcNow;
 
-        var result = await customerRepository.UpdateCustomer(customer);
-        return Results.Ok(result);
+        customerRepository.Update(customer);
+        await customerRepository.SaveAsync();
+        
+        return Results.Ok(customer);
     }
 
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    private static async Task<IResult> Delete(ICustomerRepository customerRepository, int id)
+    private static async Task<IResult> Delete(IRepository<Customer> customerRepository, int id)
     {
-        var customer = await customerRepository.GetCustomer(id);
+        var customer = await customerRepository.GetByIdAsync(id);
         if (customer == null)
         {
             return Results.NotFound("Customer not found");
         }
 
-        await customerRepository.DeleteCustomer(customer);
+        customerRepository.Delete(customer);
+        await customerRepository.SaveAsync();
+        
         return Results.Ok(customer);
     }
 }

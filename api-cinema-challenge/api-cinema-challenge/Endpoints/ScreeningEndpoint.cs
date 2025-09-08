@@ -1,6 +1,9 @@
-﻿using api_cinema_challenge.DTOs.Screening;
+﻿using System.Security.Claims;
+using api_cinema_challenge.DTOs.Screening;
+using api_cinema_challenge.Extensions;
 using api_cinema_challenge.Models;
-using api_cinema_challenge.Repository;
+using exercise.wwwapi.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api_cinema_challenge.Endpoints;
@@ -14,9 +17,11 @@ public static class ScreeningEndpoint
         movies.MapGet("/{id}/screenings", GetAll).WithDescription("Get a list of every movie.");
     }
 
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    private static async Task<IResult> Create(IScreeningRepository screeningRepository, int id,
-        ScreeningPut screeningPut)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    private static async Task<IResult> Create(IRepository<Screening> screeningRepository, int id,
+        ScreeningPut screeningPut, ClaimsPrincipal claimsPrincipal)
     {
         var createdAt = DateTime.UtcNow;
         var screening = new Screening
@@ -29,23 +34,27 @@ public static class ScreeningEndpoint
             UpdatedAt = createdAt
         };
 
-        var result = await screeningRepository.CreateScreening(screening);
+        screeningRepository.Insert(screening);
+        await screeningRepository.SaveAsync();
+        
         return Results.Created("/", new ScreeningPost
         {
-            Id = result.Id,
-            ScreenNumber = result.ScreenNumber,
-            StartsAt = result.StartsAt,
-            Capacity = result.Capacity,
+            Id = screening.Id,
+            ScreenNumber = screening.ScreenNumber,
+            StartsAt = screening.StartsAt,
+            Capacity = screening.Capacity,
             CreatedAt = createdAt,
             UpdatedAt = createdAt,
         });
     }
 
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    private static async Task<IResult> GetAll(IScreeningRepository screeningRepository, int id)
+    private static async Task<IResult> GetAll(IRepository<Screening> screeningRepository, int id)
     {
-        var result = (await screeningRepository.GetScreenings()).Where(screening => screening.MovieId == id);
+        var result = (await screeningRepository.GetAllAsync()).Where(screening => screening.MovieId == id);
         var postResults = result.Select(screening =>
             new ScreeningPost
             {

@@ -28,6 +28,7 @@ public class Movie
     public DateTime UpdatedAt { get; set; }
     
     [JsonIgnore]
+    [NotMapped]
     [Column("screenings")]
     public ICollection<Screening> Screenings { get; set; }
 }

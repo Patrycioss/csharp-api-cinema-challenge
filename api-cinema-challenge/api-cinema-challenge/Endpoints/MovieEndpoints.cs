@@ -1,6 +1,7 @@
 ﻿using api_cinema_challenge.DTOs.Movie;
 using api_cinema_challenge.Models;
-using api_cinema_challenge.Repository;
+using exercise.wwwapi.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api_cinema_challenge.Endpoints;
@@ -16,8 +17,10 @@ public static class MovieEndpoints
         movies.MapDelete("/{id:int}", Delete).WithDescription("Delete an existing movie. When deleting data, it's useful to send the deleted record back to the client so they can re-create it if deletion was a mistake.");
     }
 
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    private static async Task<IResult> Create(IMovieRepository movieRepository, MoviePut moviePut)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    private static async Task<IResult> Create(IRepository<Movie> movieRepository, MoviePut moviePut)
     {
         var createdAt = DateTime.UtcNow;
         var movie = new Movie
@@ -30,24 +33,28 @@ public static class MovieEndpoints
             UpdatedAt = createdAt,
         };
 
-        var result = await movieRepository.CreateMovie(movie);
+        movieRepository.Insert(movie);
+        await movieRepository.SaveAsync();
+        
         return Results.Created("/", new MoviePost
         {
-            Id = result.Id,
-            Title = result.Title,
-            Description = result.Description,
-            Rating = result.Rating,
-            RuntimeMins = result.RuntimeMins,
+            Id = movie.Id,
+            Title = movie.Title,
+            Description = movie.Description,
+            Rating = movie.Rating,
+            RuntimeMins = movie.RuntimeMins,
             CreatedAt = createdAt,
             UpdatedAt = createdAt,
         });
     }
 
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    private static async Task<IResult> GetAll(IMovieRepository movieRepository)
+    private static async Task<IResult> GetAll(IRepository<Movie> movieRepository)
     {
-        var result = await movieRepository.GetMovies();
+        var result = await movieRepository.GetAllAsync();
         var postResults = result.Select(m =>
             new MoviePost
             {
@@ -69,11 +76,13 @@ public static class MovieEndpoints
         return Results.Ok(postResults);
     }
     
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    private static async Task<IResult> Update(IMovieRepository movieRepository, int id, MoviePut moviePut)
+    private static async Task<IResult> Update(IRepository<Movie> movieRepository, int id, MoviePut moviePut)
     {
-        var movie = await movieRepository.GetMovie(id);
+        var movie = await movieRepository.GetByIdAsync(id);
         if (movie == null)
         {
             return Results.NotFound("Movie not found");
@@ -84,30 +93,36 @@ public static class MovieEndpoints
         movie.Rating = moviePut.Rating;
         movie.RuntimeMins = moviePut.RuntimeMins;
         
-        var result = await movieRepository.UpdateMovie(movie);
+        movieRepository.Update(movie);
+        await movieRepository.SaveAsync();
+        
         return Results.Ok(new MoviePost
         {
-            Id = result.Id,
-            Title = result.Title,
-            Description = result.Description,
-            Rating = result.Rating,
-            RuntimeMins = result.RuntimeMins,
-            CreatedAt = result.CreatedAt,
-            UpdatedAt = result.UpdatedAt
+            Id = movie.Id,
+            Title = movie.Title,
+            Description = movie.Description,
+            Rating = movie.Rating,
+            RuntimeMins = movie.RuntimeMins,
+            CreatedAt = movie.CreatedAt,
+            UpdatedAt = movie.UpdatedAt
         });
     }
     
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    private static async Task<IResult> Delete(IMovieRepository movieRepository, int id)
+    private static async Task<IResult> Delete(IRepository<Movie> movieRepository, int id)
     {
-        var movie = await movieRepository.GetMovie(id);
+        var movie = await movieRepository.GetByIdAsync(id);
         if (movie == null)
         {
             return Results.NotFound("Movie not found");
         }
 
-        await movieRepository.DeleteMovie(movie);
+        movieRepository.Delete(movie);
+        await movieRepository.SaveAsync();
+        
         return Results.Ok(movie);
     }
 }
