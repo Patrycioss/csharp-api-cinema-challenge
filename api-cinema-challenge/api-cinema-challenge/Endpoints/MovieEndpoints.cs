@@ -40,8 +40,8 @@ public static class MovieEndpoints
         {
             Id = movie.Id,
             Title = movie.Title,
-            Description = movie.Description,
             Rating = movie.Rating,
+            Description = movie.Description,
             RuntimeMins = movie.RuntimeMins,
             CreatedAt = createdAt,
             UpdatedAt = createdAt,
@@ -123,6 +123,15 @@ public static class MovieEndpoints
         movieRepository.Delete(movie);
         await movieRepository.SaveAsync();
         
-        return Results.Ok(movie);
+        return Results.Ok(new MoviePost
+        {
+            Id = movie.Id,
+            Title = movie.Title,
+            Description = movie.Description,
+            Rating = movie.Rating,
+            RuntimeMins = movie.RuntimeMins,
+            CreatedAt = movie.CreatedAt,
+            UpdatedAt = movie.UpdatedAt
+        });
     }
 }

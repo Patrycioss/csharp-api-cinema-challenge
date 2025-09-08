@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using api_cinema_challenge.DTOs.Screening;
-using api_cinema_challenge.Extensions;
 using api_cinema_challenge.Models;
 using exercise.wwwapi.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api_cinema_challenge.Endpoints;
 
-public static class ScreeningEndpoint
+public static class ScreeningEndpoints
 {
     public static void ConfigureScreeningEndpoints(this WebApplication app)
     {
@@ -41,8 +40,8 @@ public static class ScreeningEndpoint
         {
             Id = screening.Id,
             ScreenNumber = screening.ScreenNumber,
-            StartsAt = screening.StartsAt,
             Capacity = screening.Capacity,
+            StartsAt = screening.StartsAt,
             CreatedAt = createdAt,
             UpdatedAt = createdAt,
         });
@@ -60,8 +59,8 @@ public static class ScreeningEndpoint
             {
                 Id = screening.Id,
                 ScreenNumber = screening.ScreenNumber,
-                StartsAt = screening.StartsAt,
                 Capacity = screening.Capacity,
+                StartsAt = screening.StartsAt,
                 CreatedAt = screening.CreatedAt,
                 UpdatedAt = screening.UpdatedAt
             }
